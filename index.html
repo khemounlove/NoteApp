@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>កំណត់ចំណាំ</title>
+  <title>កំណត់ចំណាំ - សៀវភៅកត់ត្រាឆ្លាតវៃ</title>
   <!-- Bootstrap 5 CSS + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -60,9 +60,12 @@
     .note-img-preview img { width: 100%; height: auto; max-height: 60px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
     .card-footer { margin-top: 0.3rem; font-size: 0.45rem; color: var(--footer-color); display: flex; justify-content: space-between; border-top: 0.5px solid var(--card-border); padding-top: 0.3rem; }
     .empty-msg { grid-column: span 2; text-align: center; padding: 2rem; font-size: 0.75rem; color: var(--text-secondary); }
-    .bottom-bar { flex-shrink: 0; background: var(--bottom-bar-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 0.5rem 1rem; display: flex; justify-content: center; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
-    .file-action-btn { background: var(--btn-save); border: none; padding: 0.5rem 1rem; border-radius: 2rem; color: white; font-size: 0.7rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: transform 0.2s; }
+    .bottom-bar { flex-shrink: 0; background: var(--bottom-bar-bg); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 0.6rem 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .file-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .file-action-btn { background: var(--btn-save); border: none; padding: 0.45rem 1rem; border-radius: 2rem; color: white; font-size: 0.7rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: transform 0.2s; }
     .file-action-btn:active { transform: scale(0.96); }
+    .danger-btn { background: #b5653a; }
+    .danger-btn:hover { background: #a04d2b; }
     .color-sticker-section { margin: 0.4rem 0; }
     .color-label { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
     .color-palette { display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0.2rem 0; }
@@ -109,19 +112,28 @@
     <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="ស្វែងរកតាមចំណងជើង..."></div>
     <div class="action-icons"><button class="icon-btn" id="themeToggleBtn"><i class="bi bi-moon-stars"></i></button><button class="icon-btn" id="newNoteFullscreenBtn"><i class="bi bi-plus-lg"></i></button></div>
   </div>
-  <div class="stats-row"><span class="note-count" id="statsCount">📌 កំណត់ហេតុ</span><span><i class="bi bi-telegram"></i> រក្សាទុក</span></div>
+  <div class="stats-row"><span class="note-count" id="statsCount">📌 កំណត់ហេតុ</span><span><i class="bi bi-database"></i> ផ្ទុកក្នុងកម្មវិធីរុករក</span></div>
   <div class="notes-grid" id="notesGrid"></div>
-  
+  <!-- Bottom bar with file management actions -->
+  <div class="bottom-bar">
+    <div class="file-group">
+      <button class="file-action-btn" id="exportNotesBtn"><i class="bi bi-download"></i> រក្សាទុក data.js</button>
+      <button class="file-action-btn" id="importNotesBtn"><i class="bi bi-upload"></i> បើក data.js</button>
+      <input type="file" id="importFileInput" accept=".js, .json" style="display:none">
+      <button class="file-action-btn danger-btn" id="clearAllBtn"><i class="bi bi-trash-fill"></i> លុបទាំងអស់</button>
+    </div>
+  </div>
 </div>
 <div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">កំពុងដំណើរការ...</div></div>
-<div id="fullscreenPopup" class="fullscreen-popup"><div class="popup-card"><div class="popup-header"><h2 id="popupTitle">✨ កំណត់ហេតុថ្មី</h2><button class="close-popup-x" id="popupCloseX">✕</button></div><input type="text" id="popupTitleInput" placeholder="ចំណងជើង"><textarea id="popupBodyInput" rows="4" placeholder="សរសេរកំណត់ហេតុ..."></textarea><div class="image-upload-area"><button class="upload-btn" id="uploadImageBtn"><i class="bi bi-image"></i> បន្ថែមរូបភាព</button><input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none"><div id="imagePreviewContainer"></div></div><div class="color-sticker-section"><div class="color-label">🎨 ពណ៌ស្ទីគ័រ</div><div class="color-palette" id="colorPalette"></div></div><div class="popup-actions"><button class="btn-popup-cancel" id="popupCancelBtn">បោះបង់</button><button class="btn-popup-save" id="popupSaveBtn">រក្សាទុក</button></div></div></div>
+<div id="fullscreenPopup" class="fullscreen-popup"><div class="popup-card"><div class="popup-header"><h2 id="popupTitle">✨ កំណត់ហេតុថ្មី</h2><button class="close-popup-x" id="popupCloseX">✕</button></div><input type="text" id="popupTitleInput" placeholder="ចំណងជើង"><textarea id="popupBodyInput" rows="4" placeholder="សរសេរកំណត់ហេតុ..."></textarea><div class="image-upload-area"><button class="upload-btn" id="uploadImageBtn"><i class="bi bi-image"></i> បន្ថែមរូបភាព</button><input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none"><div id="imagePreviewContainer"></div></div><div class="color-sticker-section"><div class="color-label">🎨 ពណ៌ផ្ទៃខាងក្រោយ</div><div class="color-palette" id="colorPalette"></div></div><div class="popup-actions"><button class="btn-popup-cancel" id="popupCancelBtn">បោះបង់</button><button class="btn-popup-save" id="popupSaveBtn">រក្សាទុក</button></div></div></div>
 <div id="fullReader" class="full-reader"><div class="reader-full"><div class="reader-header"><h2 id="readerTitle"></h2><button class="close-reader-x" id="closeReaderX">✕</button></div><div id="readerImageArea" class="reader-image-area"></div><div id="readerContent" class="reader-full-content"></div><div class="reader-full-footer"><span id="readerDate"></span><button class="btn btn-sm btn-danger" id="deleteFromReaderBtn"><i class="bi bi-trash3"></i></button></div></div></div>
 <div id="customConfirm" class="custom-confirm"><div class="confirm-dialog"><p id="confirmMessage">លុបកំណត់ហេតុនេះ?</p><div class="confirm-buttons"><button class="confirm-yes" id="confirmYesBtn">បាទ</button><button class="confirm-no" id="confirmNoBtn">ទេ</button></div></div></div>
 
 <script>
+  // Telegram bot config (optional but kept for backup sync)
   const BOT_TOKEN = '8930473093:AAFcb_mDHowfLzR9Eo0oqmGTks3kyXflBqU';
   let CHAT_ID = null;
-  const STORAGE_KEY = 'queasy_sticker_images_v3';
+  const STORAGE_KEY = 'queasy_sticker_images_v4';
   const THEME_KEY = 'queasy_theme_khmer';
   const STICKER_COLORS = ['#FFE8D6', '#FFD6E0', '#C9E4DE', '#C2E0F0', '#FCE1B3', '#E0D3FF', '#FBC8B5', '#C4E6F1', '#F9E6B3', '#D4F1F9', '#FFDDCC', '#E2F0CB', '#FFC8A2', '#D9E5FF', '#FADADD', '#BDE0FE'];
   const DARK_STICKER_COLORS = ['#3d3d3d', '#4a3a3a', '#2d4a4a', '#2d3a5a', '#5a4a2a', '#4a3a6a', '#5a3a3a', '#3a5a5a', '#5a4a3a', '#3a5a4a', '#5a3a4a', '#4a5a3a', '#6a4a3a', '#3a4a6a', '#5a3a5a', '#3a5a6a'];
@@ -135,10 +147,10 @@
   function showLoading(msg) { const o=document.getElementById('loadingOverlay'); document.getElementById('loadingText').textContent=msg; o.style.display='flex'; }
   function hideLoading() { document.getElementById('loadingOverlay').style.display='none'; }
   function showToast(msg, isErr=false) { const t=document.createElement('div'); t.className='toast-custom'; t.style.background=isErr?'#dc2626':'var(--btn-save)'; t.innerHTML=`<i class="bi ${isErr?'bi-exclamation-triangle':'bi-check-circle'}"></i> ${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
-  function genId() { return Date.now()+'-'+Math.random().toString(36).substring(2,8); }
+  function genId() { return Date.now()+'-'+Math.random().toString(36).substring(2,10); }
   function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, c=>c==='&'?'&amp;':c==='<'?'&lt;':'&gt;'); }
-  function escapeMarkdown(text) { if(!text) return ''; return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&'); }
 
+  // Image compression helper
   function compressImage(dataUrl, maxWidth=800, quality=0.7) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -155,34 +167,10 @@
     });
   }
 
-  async function sendToTelegramWithImage(title, content, imageDataUrl, action, dateStr) {
-    try { await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getMe`); } catch(e) { showToast('Bot error',true); return false; }
-    if(!CHAT_ID) { await getUpdates(); if(!CHAT_ID) { showToast('សូមផ្ញើសារទៅកាន់  សិន',true); return false; } }
-    const caption = `${action === 'new' ? '📝 កំណត់ហេតុថ្មី' : '✏️ កែសម្រួល'}\n\n📌 ${escapeMarkdown(title)}\n\n📄 ${escapeMarkdown(content.substring(0,800))}\n\n📅 ${dateStr}`.substring(0,1024);
-    if(imageDataUrl) {
-      const blob = await (await fetch(imageDataUrl)).blob();
-      const formData = new FormData();
-      formData.append('chat_id', CHAT_ID);
-      formData.append('photo', blob, 'note_image.jpg');
-      formData.append('caption', caption);
-      try {
-        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
-        const data = await res.json();
-        if(data.ok) { showToast('បានរក្សាទុករួចរាល់'); return true; }
-        else { showToast('ផ្ញើរូបភាពមិនជោគជ័យ',true); return false; }
-      } catch(e) { showToast('បរាជ័យ',true); return false; }
-    } else {
-      const text = `${action === 'new' ? '📝 កំណត់ហេតុថ្មី' : '✏️ កែសម្រួល'}\n\n📌 ${title}\n\n📄 ${content}\n\n📅 ${dateStr}`;
-      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ chat_id:CHAT_ID, text:text.substring(0,4096) }) });
-      const data = await res.json();
-      if(data.ok) { showToast('បានរក្សាទុករួចរាល់'); return true; }
-      return false;
-    }
-  }
+  // Telegram (optional, doesn't block core)
+  async function getUpdates() { try { const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`); const data=await res.json(); if(data.ok && data.result.length>0) { CHAT_ID=data.result[data.result.length-1].message.chat.id; } } catch(e){} }
 
-  async function getUpdates() { try { const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`); const data=await res.json(); if(data.ok && data.result.length>0) { CHAT_ID=data.result[data.result.length-1].message.chat.id; return true; } } catch(e){} return false; }
-
-  // CRUD Core Functions
+  // Data persistence
   function loadData() { 
     const stored = localStorage.getItem(STORAGE_KEY); 
     if(stored) { 
@@ -194,22 +182,22 @@
         } 
       } catch(e){} 
     } 
-    // Default sample data
+    // sample notes
     notes = [
       { id: genId(), title: "ស្វាគមន៍!", content: "សូមស្វាគមន៍មកកាន់កម្មវិធីកំណត់ចំណាំ។ អ្នកអាចបន្ថែមរូបភាព ផ្លាស់ប្តូរពណ៌។", pinned: true, stickerColor: STICKER_COLORS[0], createdAt: Date.now(), imageDataUrl: null },
-      { id: genId(), title: "របៀបប្រើប្រាស់", content: "ចុច + ដើម្បីបង្កើតកំណត់ហេតុថ្មី។ អ្នកអាចបន្ថែមរូបភាព និងជ្រើសរើសពណ៌ស្ទីគ័រ។ ចុចប៊ូតុងរក្សាទុក notesData.js ដើម្បីបម្រុងទុកទិន្នន័យ។", pinned: false, stickerColor: STICKER_COLORS[3], createdAt: Date.now() - 86400000, imageDataUrl: null }
+      { id: genId(), title: "របៀបប្រើប្រាស់", content: "ចុច + ដើម្បីបង្កើតកំណត់ហេតុថ្មី។ អ្នកអាចបន្ថែមរូបភាព និងជ្រើសរើសពណ៌។ ប្រើប៊ូតុងរក្សាទុក data.js ដើម្បីបម្រុងទុកទិន្នន័យ។", pinned: false, stickerColor: STICKER_COLORS[3], createdAt: Date.now() - 86400000, imageDataUrl: null }
     ];
     saveData();
   }
   function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); renderGrid(); }
   
-  // Export to notesData.js file
+  // Export to notesData.js (data store in browser file)
   function exportToJSFile() {
     const exportData = notes.map(n => ({ 
       id: n.id, title: n.title, content: n.content, pinned: n.pinned, 
       stickerColor: n.stickerColor, createdAt: n.createdAt, imageDataUrl: n.imageDataUrl || null 
     }));
-    const fileContent = `// ============================================\n// NOTES DATA FILE - Generated by Sticky Notes App\n// Date: ${new Date().toLocaleString()}\n// ============================================\n\nconst notesData = ${JSON.stringify(exportData, null, 2)};\n\n// Export for use in app\nif (typeof module !== 'undefined' && module.exports) { module.exports = notesData; }\n\n// To restore: click "បើក notesData.js" button and select this file\nconsole.log('📝 Notes data loaded:', notesData.length, 'notes');`;
+    const fileContent = `// ============================================\n// NOTES DATA FILE - Generated by Note App\n// Date: ${new Date().toLocaleString()}\n// ============================================\n\nconst notesData = ${JSON.stringify(exportData, null, 2)};\n\n// To restore: click "បើក data.js" button and select this file\nconsole.log('📝 Notes data loaded:', notesData.length, 'notes');`;
     const blob = new Blob([fileContent], { type: 'application/javascript' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -219,21 +207,20 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(`បានរក្សាទុក notesData.js ដោយជោគជ័យ! (${notes.length} កំណត់ហេតុ)`);
+    showToast(`បានរក្សាទុក notesData.js (${notes.length} កំណត់ហេតុ)`);
   }
   
-  // Import from notesData.js file
+  // Import from notesData.js file (restore full data)
   function importFromJSFile(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
         let content = e.target.result;
-        // Extract JSON array from the JS file
         let match = content.match(/notesData\s*=\s*(\[[\s\S]*?\]);/);
         if (!match) match = content.match(/(\[[\s\S]*?\]);?\s*$/);
         if (match) {
           const importedNotes = JSON.parse(match[1]);
-          if (Array.isArray(importedNotes) && importedNotes.length >= 0) {
+          if (Array.isArray(importedNotes)) {
             notes = importedNotes.map(n => ({ 
               ...n, 
               pinned: n.pinned === true, 
@@ -244,17 +231,16 @@
             showToast(`បានបើកឯកសារដោយជោគជ័យ! (${notes.length} កំណត់ហេតុ)`);
           } else throw new Error('Invalid format');
         } else throw new Error('No valid notes array found');
-      } catch(err) { showToast('ឯកសារមិនត្រឹមត្រូវ ឬខូចទ្រង់ទ្រាយ', true); }
+      } catch(err) { showToast('ឯកសារមិនត្រឹមត្រូវ', true); }
     };
     reader.readAsText(file);
   }
   
-  // Clear all data
   function clearAllData() {
     notes = [];
     saveData();
     closeReader();
-    showToast('បានលុបកំណត់ហេតុទាំងអស់ដោយជោគជ័យ!');
+    showToast('បានលុបកំណត់ហេតុទាំងអស់!');
   }
 
   function filterSearch() { if(!currentSearchQuery.trim()) return [...notes]; const q=currentSearchQuery.toLowerCase(); return notes.filter(n=>n.title.toLowerCase().includes(q)); }
@@ -282,19 +268,19 @@
     document.querySelectorAll('.note-card').forEach(card=>card.addEventListener('click',(e)=>{ if(e.target.closest('.pin-mini')||e.target.closest('.icon-small')) return; openFullscreenReader(card.dataset.noteId); }));
   }
 
-  async function togglePin(id) { showLoading('កំពុងភ្ជាប់...'); await new Promise(r=>setTimeout(r,200)); const n=notes.find(n=>n.id===id); if(n) n.pinned=!n.pinned; saveData(); hideLoading(); }
-  async function deleteNote(id) { showLoading('កំពុងលុប...'); await new Promise(r=>setTimeout(r,200)); notes=notes.filter(n=>n.id!==id); saveData(); if(document.getElementById('fullReader').style.display==='flex') closeReader(); hideLoading(); showToast('បានលុប'); }
+  async function togglePin(id) { showLoading('កំពុងភ្ជាប់...'); await new Promise(r=>setTimeout(r,100)); const n=notes.find(n=>n.id===id); if(n) n.pinned=!n.pinned; saveData(); hideLoading(); }
+  async function deleteNote(id) { showLoading('កំពុងលុប...'); await new Promise(r=>setTimeout(r,100)); notes=notes.filter(n=>n.id!==id); saveData(); if(document.getElementById('fullReader').style.display==='flex') closeReader(); hideLoading(); showToast('បានលុប'); }
 
-  async function addNewNote(title,content,imageDataUrl,stickerColor) { if(!title.trim()&&!content.trim()&&!imageDataUrl) { alert("សូមបញ្ចូលចំណងជើង ឬខ្លឹមសារ ឬរូបភាព"); return false; } const now=Date.now(); const newNote={ id:genId(), title:title.trim()||"កំណត់ហេតុ", content:content.trim()||" ", pinned:false, stickerColor:stickerColor||STICKER_COLORS[0], createdAt:now, imageDataUrl:imageDataUrl||null }; notes.unshift(newNote); saveData(); const dateStr=new Date(now).toLocaleString('km-KH',{ dateStyle:'full', timeStyle:'short' }); await sendToTelegramWithImage(newNote.title, newNote.content, newNote.imageDataUrl, 'new', dateStr); return true; }
-  async function updateNote(id,newTitle,newContent,newImageDataUrl,newStickerColor) { const idx=notes.findIndex(n=>n.id===id); if(idx!==-1) { if(!newTitle.trim()&&!newContent.trim()&&!newImageDataUrl) { alert("កំណត់ហេតុមិនអាចទទេ"); return false; } notes[idx].title=newTitle.trim()||"គ្មានចំណងជើង"; notes[idx].content=newContent.trim()||"(ទទេ)"; if(newStickerColor) notes[idx].stickerColor=newStickerColor; notes[idx].imageDataUrl=newImageDataUrl||null; saveData(); const dateStr=new Date(notes[idx].createdAt).toLocaleString('km-KH',{ dateStyle:'full',timeStyle:'short' }); await sendToTelegramWithImage(notes[idx].title, notes[idx].content, notes[idx].imageDataUrl, 'edit', dateStr); return true; } return false; }
+  async function addNewNote(title,content,imageDataUrl,stickerColor) { if(!title.trim()&&!content.trim()&&!imageDataUrl) { showToast("សូមបញ្ចូលចំណងជើង ឬខ្លឹមសារ", true); return false; } const now=Date.now(); const newNote={ id:genId(), title:title.trim()||"កំណត់ហេតុ", content:content.trim()||" ", pinned:false, stickerColor:stickerColor||STICKER_COLORS[0], createdAt:now, imageDataUrl:imageDataUrl||null }; notes.unshift(newNote); saveData(); return true; }
+  async function updateNote(id,newTitle,newContent,newImageDataUrl,newStickerColor) { const idx=notes.findIndex(n=>n.id===id); if(idx!==-1) { if(!newTitle.trim()&&!newContent.trim()&&!newImageDataUrl) { showToast("កំណត់ហេតុមិនអាចទទេ", true); return false; } notes[idx].title=newTitle.trim()||"គ្មានចំណងជើង"; notes[idx].content=newContent.trim()||"(ទទេ)"; if(newStickerColor) notes[idx].stickerColor=newStickerColor; notes[idx].imageDataUrl=newImageDataUrl||null; saveData(); return true; } return false; }
 
   const popup=document.getElementById('fullscreenPopup'), popupTitle=document.getElementById('popupTitle'), titleInput=document.getElementById('popupTitleInput'), bodyInput=document.getElementById('popupBodyInput'), saveBtn=document.getElementById('popupSaveBtn'), cancelBtn=document.getElementById('popupCancelBtn'), closeX=document.getElementById('popupCloseX'), uploadBtn=document.getElementById('uploadImageBtn'), imageFileInput=document.getElementById('imageFileInput'), imagePreviewContainer=document.getElementById('imagePreviewContainer');
   function updateImagePreview(dataUrl) { currentImageDataUrl=dataUrl; imagePreviewContainer.innerHTML=''; if(dataUrl) { const div=document.createElement('div'); div.className='image-preview-container'; div.innerHTML=`<img src="${dataUrl}" class="current-image-preview" style="max-width:100%; max-height:120px; border-radius:16px;"><button type="button" class="remove-img-btn" id="removeCurrentImage"><i class="bi bi-x-circle"></i> លុបរូប</button>`; imagePreviewContainer.appendChild(div); document.getElementById('removeCurrentImage')?.addEventListener('click',()=>{ currentImageDataUrl=null; updateImagePreview(null); }); } else { imagePreviewContainer.innerHTML=''; } }
   function openCreatePopup() { editingId=null; popupTitle.innerText='✨ កំណត់ហេតុថ្មី'; titleInput.value=''; bodyInput.value=''; currentImageDataUrl=null; updateImagePreview(null); selectedStickerColor=document.body.classList.contains('dark')?DARK_STICKER_COLORS[0]:STICKER_COLORS[0]; renderColorPalette(); popup.style.display='flex'; }
   async function openEditPopup(id) { const note=notes.find(n=>n.id===id); if(!note) return; editingId=id; popupTitle.innerText='✏️ កែសម្រួល'; titleInput.value=note.title; bodyInput.value=note.content; currentImageDataUrl=note.imageDataUrl||null; updateImagePreview(currentImageDataUrl); selectedStickerColor=note.stickerColor||STICKER_COLORS[0]; renderColorPalette(); popup.style.display='flex'; }
   function closePopup() { popup.style.display='none'; editingId=null; currentImageDataUrl=null; }
-  async function handleSave() { showLoading(editingId?'កំពុងកែសម្រួល...':'កំពុងរក្សាទុក...'); let finalImg=currentImageDataUrl; if(finalImg && finalImg.startsWith('data:image') && finalImg.length>1000000) { finalImg=await compressImage(finalImg, 800, 0.7); } if(editingId) await updateNote(editingId, titleInput.value, bodyInput.value, finalImg, selectedStickerColor); else await addNewNote(titleInput.value, bodyInput.value, finalImg, selectedStickerColor); hideLoading(); closePopup(); }
-  uploadBtn.addEventListener('click',()=>imageFileInput.click()); imageFileInput.addEventListener('change', async (e)=>{ const file=e.target.files[0]; if(file && file.type.startsWith('image/')) { showLoading('កំពុងដំណើរការរូបភាព...'); const reader=new FileReader(); reader.onload=async (ev)=>{ let compressed=await compressImage(ev.target.result, 800, 0.7); currentImageDataUrl=compressed; updateImagePreview(currentImageDataUrl); hideLoading(); }; reader.readAsDataURL(file); } else if(file){ alert('សូមជ្រើសរូបភាព'); } });
+  async function handleSave() { showLoading(editingId?'កំពុងកែសម្រួល...':'កំពុងរក្សាទុក...'); let finalImg=currentImageDataUrl; if(finalImg && finalImg.startsWith('data:image') && finalImg.length>800000) { finalImg=await compressImage(finalImg, 800, 0.7); } let success=false; if(editingId) success=await updateNote(editingId, titleInput.value, bodyInput.value, finalImg, selectedStickerColor); else success=await addNewNote(titleInput.value, bodyInput.value, finalImg, selectedStickerColor); hideLoading(); if(success) closePopup(); else showToast('ប្រតិបត្តិការបរាជ័យ', true); }
+  uploadBtn.addEventListener('click',()=>imageFileInput.click()); imageFileInput.addEventListener('change', async (e)=>{ const file=e.target.files[0]; if(file && file.type.startsWith('image/')) { showLoading('កំពុងដំណើរការរូបភាព...'); const reader=new FileReader(); reader.onload=async (ev)=>{ let compressed=await compressImage(ev.target.result, 800, 0.7); currentImageDataUrl=compressed; updateImagePreview(currentImageDataUrl); hideLoading(); }; reader.readAsDataURL(file); } else if(file){ showToast('សូមជ្រើសរូបភាព', true); } });
   saveBtn.addEventListener('click',handleSave); cancelBtn.addEventListener('click',closePopup); closeX.addEventListener('click',closePopup); popup.addEventListener('click',(e)=>{if(e.target===popup) closePopup();});
   document.getElementById('newNoteFullscreenBtn').addEventListener('click',openCreatePopup);
 
@@ -311,18 +297,16 @@
   
   function showConfirm(msg,onYes,onNo){ const modal=document.getElementById('customConfirm'); document.getElementById('confirmMessage').innerText=msg; modal.style.display='flex'; const yes=document.getElementById('confirmYesBtn'), no=document.getElementById('confirmNoBtn'); const handleYes=()=>{ modal.style.display='none'; yes.removeEventListener('click',handleYes); no.removeEventListener('click',handleNo); if(onYes) onYes(); }; const handleNo=()=>{ modal.style.display='none'; yes.removeEventListener('click',handleYes); no.removeEventListener('click',handleNo); if(onNo) onNo(); }; yes.addEventListener('click',handleYes); no.addEventListener('click',handleNo); }
 
-  // File export/import handlers
+  // File handlers
   document.getElementById('exportNotesBtn').addEventListener('click', exportToJSFile);
   const importBtn = document.getElementById('importNotesBtn');
   const importFileInput = document.getElementById('importFileInput');
   importBtn.addEventListener('click', () => importFileInput.click());
   importFileInput.addEventListener('change', (e) => { if(e.target.files[0]) importFromJSFile(e.target.files[0]); e.target.value = ''; });
   document.getElementById('clearAllBtn').addEventListener('click', () => { showConfirm("លុបកំណត់ហេតុទាំងអស់? (មិនអាចស្ដារវិញ)", () => clearAllData(), null); });
-  
-  // Double click logo to reset default
   document.getElementById('logoArea').addEventListener('dblclick', () => { showConfirm("ស្ដារកំណត់ហេតុដើមវិញ?", () => { loadData(); }, null); });
 
-  loadData(); initTheme(); setTimeout(async()=>{ await getUpdates(); }, 2000);
+  loadData(); initTheme(); setTimeout(()=>{ getUpdates(); }, 1500);
 </script>
 </body>
 </html>
