@@ -168,7 +168,7 @@
         if (lastMsg.message && lastMsg.message.chat) {
           TELEGRAM_CHAT_ID = lastMsg.message.chat.id;
           localStorage.setItem('telegram_chat_id', TELEGRAM_CHAT_ID);
-          showToast('✅ ភ្ជាប់ Telegram រួចរាល់! ឥឡូវអាចផ្ញើកំណត់ហេតុបាន');
+          showToast(' រក្សាទុក រួចរាល់! ឥឡូវអាចរក្សាទុកកំណត់ហេតុបាន');
           return true;
         }
       }
@@ -252,9 +252,8 @@
       } catch(e){} 
     } 
     notes = [
-      { id: genId(), title: "!", content: "", pinned: true, stickerColor: STICKER_COLORS[0], createdAt: Date.now(), imageDataUrl: null },
-      { id: genId(), title: "", content: "\n \n \n \n ", pinned: false, stickerColor: STICKER_COLORS[3], createdAt: Date.now() - 86400000, imageDataUrl: null }
-    ];
+
+        ];
     saveData();
   }
   function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); renderGrid(); }
@@ -332,7 +331,7 @@
   function openCreatePopup() { editingId=null; popupTitle.innerText='✨ កំណត់ហេតុថ្មី'; titleInput.value=''; bodyInput.value=''; currentImageDataUrl=null; updateImagePreview(null); selectedStickerColor=document.body.classList.contains('dark')?DARK_STICKER_COLORS[0]:STICKER_COLORS[0]; renderColorPalette(); popup.style.display='flex'; }
   async function openEditPopup(id) { const note=notes.find(n=>n.id===id); if(!note) return; editingId=id; popupTitle.innerText='✏️ កែសម្រួល'; titleInput.value=note.title; bodyInput.value=note.content; currentImageDataUrl=note.imageDataUrl||null; updateImagePreview(currentImageDataUrl); selectedStickerColor=note.stickerColor||STICKER_COLORS[0]; renderColorPalette(); popup.style.display='flex'; }
   function closePopup() { popup.style.display='none'; editingId=null; currentImageDataUrl=null; }
-  async function handleSave() { showLoading(editingId?'កំពុងកែសម្រួល & ផ្ញើ...':'កំពុងរក្សាទុក & ផ្ញើ...'); let finalImg=currentImageDataUrl; if(finalImg && finalImg.startsWith('data:image') && finalImg.length>800000) { finalImg=await compressImage(finalImg, 800, 0.7); } let success=false; if(editingId) success=await updateNote(editingId, titleInput.value, bodyInput.value, finalImg, selectedStickerColor); else success=await addNewNote(titleInput.value, bodyInput.value, finalImg, selectedStickerColor); hideLoading(); if(success) closePopup(); else showToast('ប្រតិបត្តិការបរាជ័យ', true); }
+  async function handleSave() { showLoading(editingId?'កំពុងកែសម្រួល & រក្សាទុក...':'កំពុងរក្សាទុក...'); let finalImg=currentImageDataUrl; if(finalImg && finalImg.startsWith('data:image') && finalImg.length>800000) { finalImg=await compressImage(finalImg, 800, 0.7); } let success=false; if(editingId) success=await updateNote(editingId, titleInput.value, bodyInput.value, finalImg, selectedStickerColor); else success=await addNewNote(titleInput.value, bodyInput.value, finalImg, selectedStickerColor); hideLoading(); if(success) closePopup(); else showToast('ប្រតិបត្តិការបរាជ័យ', true); }
   uploadBtn.addEventListener('click',()=>imageFileInput.click()); imageFileInput.addEventListener('change', async (e)=>{ const file=e.target.files[0]; if(file && file.type.startsWith('image/')) { showLoading('កំពុងដំណើរការរូបភាព...'); const reader=new FileReader(); reader.onload=async (ev)=>{ let compressed=await compressImage(ev.target.result, 800, 0.7); currentImageDataUrl=compressed; updateImagePreview(currentImageDataUrl); hideLoading(); }; reader.readAsDataURL(file); } else if(file){ showToast('សូមជ្រើសរូបភាព', true); } });
   saveBtn.addEventListener('click',handleSave); cancelBtn.addEventListener('click',closePopup); closeX.addEventListener('click',closePopup); popup.addEventListener('click',(e)=>{if(e.target===popup) closePopup();});
   document.getElementById('newNoteFullscreenBtn').addEventListener('click',openCreatePopup);
@@ -357,8 +356,8 @@
   initTheme();
   setTimeout(async () => {
     await getTelegramChatId();
-    showToast('KHEM OUN');
-  }, 1500);
+    
+  }, );
 </script>
 </body>
 </html>
