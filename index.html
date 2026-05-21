@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>កំណត់ចំណាំ · ស្ទីគ័រពណ៌ + រូបភាព + តេឡេក្រាម</title>
+  <title>កំណត់ចំណាំ</title>
   <!-- Bootstrap 5 CSS + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -109,14 +109,9 @@
     <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="ស្វែងរកតាមចំណងជើង..."></div>
     <div class="action-icons"><button class="icon-btn" id="themeToggleBtn"><i class="bi bi-moon-stars"></i></button><button class="icon-btn" id="newNoteFullscreenBtn"><i class="bi bi-plus-lg"></i></button></div>
   </div>
-  <div class="stats-row"><span class="note-count" id="statsCount">📌 កំណត់ហេតុ</span><span><i class="bi bi-telegram"></i> ផ្ញើរូបភាព</span></div>
+  <div class="stats-row"><span class="note-count" id="statsCount">📌 កំណត់ហេតុ</span><span><i class="bi bi-telegram"></i> រក្សាទុក</span></div>
   <div class="notes-grid" id="notesGrid"></div>
-  <div class="bottom-bar" id="bottomBar">
-    <button class="file-action-btn" id="exportNotesBtn"><i class="bi bi-save"></i> រក្សាទុក notesData.js</button>
-    <button class="file-action-btn" id="importNotesBtn"><i class="bi bi-folder-symlink"></i> បើក notesData.js</button>
-    <input type="file" id="importFileInput" accept=".js" style="display:none">
-    <button class="file-action-btn" id="clearAllBtn" style="background:#b91c1c"><i class="bi bi-trash3"></i> លុបទាំងអស់</button>
-  </div>
+  
 </div>
 <div id="loadingOverlay" class="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">កំពុងដំណើរការ...</div></div>
 <div id="fullscreenPopup" class="fullscreen-popup"><div class="popup-card"><div class="popup-header"><h2 id="popupTitle">✨ កំណត់ហេតុថ្មី</h2><button class="close-popup-x" id="popupCloseX">✕</button></div><input type="text" id="popupTitleInput" placeholder="ចំណងជើង"><textarea id="popupBodyInput" rows="4" placeholder="សរសេរកំណត់ហេតុ..."></textarea><div class="image-upload-area"><button class="upload-btn" id="uploadImageBtn"><i class="bi bi-image"></i> បន្ថែមរូបភាព</button><input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none"><div id="imagePreviewContainer"></div></div><div class="color-sticker-section"><div class="color-label">🎨 ពណ៌ស្ទីគ័រ</div><div class="color-palette" id="colorPalette"></div></div><div class="popup-actions"><button class="btn-popup-cancel" id="popupCancelBtn">បោះបង់</button><button class="btn-popup-save" id="popupSaveBtn">រក្សាទុក</button></div></div></div>
@@ -162,7 +157,7 @@
 
   async function sendToTelegramWithImage(title, content, imageDataUrl, action, dateStr) {
     try { await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getMe`); } catch(e) { showToast('Bot error',true); return false; }
-    if(!CHAT_ID) { await getUpdates(); if(!CHAT_ID) { showToast('សូមផ្ញើសារទៅកាន់ Telegram Bot សិន',true); return false; } }
+    if(!CHAT_ID) { await getUpdates(); if(!CHAT_ID) { showToast('សូមផ្ញើសារទៅកាន់  សិន',true); return false; } }
     const caption = `${action === 'new' ? '📝 កំណត់ហេតុថ្មី' : '✏️ កែសម្រួល'}\n\n📌 ${escapeMarkdown(title)}\n\n📄 ${escapeMarkdown(content.substring(0,800))}\n\n📅 ${dateStr}`.substring(0,1024);
     if(imageDataUrl) {
       const blob = await (await fetch(imageDataUrl)).blob();
@@ -173,14 +168,14 @@
       try {
         const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
         const data = await res.json();
-        if(data.ok) { showToast('បានផ្ញើរូបភាពទៅ Telegram'); return true; }
+        if(data.ok) { showToast('បានរក្សាទុករួចរាល់'); return true; }
         else { showToast('ផ្ញើរូបភាពមិនជោគជ័យ',true); return false; }
       } catch(e) { showToast('បរាជ័យ',true); return false; }
     } else {
       const text = `${action === 'new' ? '📝 កំណត់ហេតុថ្មី' : '✏️ កែសម្រួល'}\n\n📌 ${title}\n\n📄 ${content}\n\n📅 ${dateStr}`;
       const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ chat_id:CHAT_ID, text:text.substring(0,4096) }) });
       const data = await res.json();
-      if(data.ok) { showToast('បានផ្ញើទៅ Telegram'); return true; }
+      if(data.ok) { showToast('បានរក្សាទុករួចរាល់'); return true; }
       return false;
     }
   }
@@ -201,7 +196,7 @@
     } 
     // Default sample data
     notes = [
-      { id: genId(), title: "ស្វាគមន៍!", content: "សូមស្វាគមន៍មកកាន់កម្មវិធីកំណត់ចំណាំ។ អ្នកអាចបន្ថែមរូបភាព ផ្លាស់ប្តូរពណ៌ និងផ្ញើទៅ Telegram ។", pinned: true, stickerColor: STICKER_COLORS[0], createdAt: Date.now(), imageDataUrl: null },
+      { id: genId(), title: "ស្វាគមន៍!", content: "សូមស្វាគមន៍មកកាន់កម្មវិធីកំណត់ចំណាំ។ អ្នកអាចបន្ថែមរូបភាព ផ្លាស់ប្តូរពណ៌។", pinned: true, stickerColor: STICKER_COLORS[0], createdAt: Date.now(), imageDataUrl: null },
       { id: genId(), title: "របៀបប្រើប្រាស់", content: "ចុច + ដើម្បីបង្កើតកំណត់ហេតុថ្មី។ អ្នកអាចបន្ថែមរូបភាព និងជ្រើសរើសពណ៌ស្ទីគ័រ។ ចុចប៊ូតុងរក្សាទុក notesData.js ដើម្បីបម្រុងទុកទិន្នន័យ។", pinned: false, stickerColor: STICKER_COLORS[3], createdAt: Date.now() - 86400000, imageDataUrl: null }
     ];
     saveData();
